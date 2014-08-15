@@ -36,12 +36,18 @@ module SimpleTokenAuthentication
       if email = params[params_email_name].blank? && request.headers[header_email_name(entity_class)]
         params[params_email_name] = email
       end
+      
+      
+  		url_regex = %r((http|https)://([^./]*)\.([^/]*)/(.*))
+			url = request.original_url
+			domain_name = url.gsub(url_regex, "\\2")
+      domain = domain_name.downcase
 
       email = params[params_email_name].presence
       # See https://github.com/ryanb/cancan/blob/1.6.10/lib/cancan/controller_resource.rb#L108-L111
       entity = nil
       if entity_class.respond_to? "find_by"
-        entity = email && entity_class.find_by(email: email)
+        entity = email && entity_class.join(:domain).where('email = ? AND domain.name = ?',email ,domain)
       elsif entity_class.respond_to? "find_by_email"
         entity = email && entity_class.find_by_email(email)
       end
