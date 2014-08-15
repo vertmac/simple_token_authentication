@@ -47,7 +47,7 @@ module SimpleTokenAuthentication
       # See https://github.com/ryanb/cancan/blob/1.6.10/lib/cancan/controller_resource.rb#L108-L111
       entity = nil
       if entity_class.respond_to? "find_by"
-        entity = email && entity_class.joins(:domain).where('email = ? AND domains.name = ?',email ,domain)
+        entity = email && entity_class.joins(:domain).where('email = ? AND domains.name = ?',email ,domain).last
       elsif entity_class.respond_to? "find_by_email"
         entity = email && entity_class.find_by_email(email)
       end
